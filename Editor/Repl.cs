@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 using clojure.lang;
 using System;
@@ -14,10 +14,12 @@ namespace Arcadia
 	public class Repl : EditorWindow
 	{
 		private static UdpClient replSocket;
+		private Vector2 scrollPos;
+		public static String lastEval = "";
 
 		static Repl()
 		{
-            Util.require("arcadia.repl");
+                        Util.require("arcadia.repl");
 		}
 
 		[MenuItem("Arcadia/REPL/Window...")]
@@ -57,27 +59,31 @@ namespace Arcadia
 		{
 			bool serverRunning = RT.booleanCast(((Atom)RT.var("arcadia.repl", "server-running").deref()).deref());
 			Color oldColor = GUI.color;
+
 			if (serverRunning)
 			{
-				GUI.color = Color.red;
-				if (GUILayout.Button("Stop REPL"))
+				// GUI.color = Color.red;
+				// if (GUILayout.Button("Stop REPL"))
+				// {
+				// 	Repl.StopREPL();
+				// }
+				// GUI.color = oldColor;
+				if (replSocket != null) 
 				{
-					Repl.StopREPL();
+					EditorStyles.label.wordWrap = true;
+					scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUIStyle.none, GUI.skin.verticalScrollbar);
+					EditorGUILayout.LabelField("REPL is listening on " + replSocket.Client.LocalEndPoint, GUILayout.Width(Screen.width-10));
+					EditorGUILayout.LabelField(lastEval, GUILayout.Width(Screen.width-20));
+					EditorGUILayout.EndScrollView();
 				}
-				GUI.color = oldColor;
-
-				if (replSocket != null)
-					GUILayout.Label("REPL is listening on " + replSocket.Client.LocalEndPoint);
-
 			}
 			else {
-				GUI.color = Color.green;
-				if (GUILayout.Button("Start REPL"))
-				{
-					Repl.StartREPL();
-				}
-				GUI.color = oldColor;
-
+				// GUI.color = Color.green;
+				// if (GUILayout.Button("Start REPL"))
+				// {
+				// 	Repl.StartREPL();
+				// }
+				// GUI.color = oldColor;
 				GUILayout.Label("REPL is not running");
 			}
 		}
