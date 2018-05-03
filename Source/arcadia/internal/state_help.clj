@@ -35,7 +35,7 @@
           (.Clear jm)
           (.AddAll jm
             (convert-vars
-              (read-string (.edn as)))))
+              (read-string (.edn as))))) ;this guy seems to be slowing things down in the inspector
         (catch Exception e
           (Debug/Log "Exception encountered in arcadia.internal.state-help/deserialize:")
           (Debug/Log e)

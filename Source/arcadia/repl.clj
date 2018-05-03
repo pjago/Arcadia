@@ -216,6 +216,7 @@
           (swap! ip-map assoc destination env2)                  ; update ip-map with new env
           (try
             (send result)
+            (set! Arcadia.Repl/lastEval result)
             (catch SocketException e
               (Debug/Log (str "SocketException encountered:\n" e))
               (send (.ToString e)))))

@@ -1,4 +1,4 @@
-;   Copyright (c) Rich Hickey. All rights reserved.
+﻿;   Copyright (c) Rich Hickey. All rights reserved.
 ;   The use and distribution terms for this software are covered by the
 ;   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
 ;   which can be found in the file epl-v10.html at the root of this distribution.
@@ -8,7 +8,7 @@
 
 (ns clojure.spec.gen
     (:refer-clojure :exclude [boolean bytes cat hash-map list map not-empty set vector
-                              char double int keyword symbol string uuid delay]))
+                              char float double int keyword symbol string uuid delay]))
 
 (alias 'c 'clojure.core)
 
@@ -20,7 +20,7 @@
     (let [v (resolve s)]
       (if v
         @v
-        (throw (Exception. (str "Var " s " is not on the classpath")))))))
+        (throw (Exception. (str "Var " s " is not on the classpath")))))))                  ;;; RuntimeException.
 
 (def ^:private quick-check-ref
      (c/delay (dynaload 'clojure.test.check/quick-check)))
@@ -68,7 +68,7 @@
   (let [g (dynaload s)]
     (if (generator? g)
       g
-      (throw (Exception. (str "Var " s " is not a generator"))))))
+      (throw (Exception. (str "Var " s " is not a generator"))))))        ;;; RuntimeException.
 
 (defmacro ^:skip-wiki lazy-combinator
   "Implementation macro, do not call directly."
@@ -91,7 +91,7 @@
 
 (lazy-combinators hash-map list map not-empty set vector vector-distinct fmap elements
                   bind choose fmap one-of such-that tuple sample return
-                  large-integer* double*)
+                  large-integer* float* double* frequency)
 
 (defmacro ^:skip-wiki lazy-prim
   "Implementation macro, do not call directly."
@@ -112,7 +112,7 @@
         (fn [s] (c/list 'lazy-prim s))
         syms)))
 
-(lazy-prims any any-printable boolean bytes char char-alpha char-alphanumeric char-ascii double
+(lazy-prims any any-printable boolean bytes char char-alpha char-alphanumeric char-ascii float double
             int keyword keyword-ns large-integer ratio simple-type simple-type-printable
             string string-ascii string-alphanumeric symbol symbol-ns uuid)
 
@@ -137,11 +137,11 @@ gens, each of which should generate something sequential."
       pos-int? (large-integer* {:min 1})
       neg-int? (large-integer* {:max -1})
       nat-int? (large-integer* {:min 0})
-      float? (double)
+      float? (float)
       double? (double)
       boolean? (boolean)
       string? (string-alphanumeric)
-      ident? (one-of [(keyword-ns) (symbol-ns)])
+	  ident? (one-of [(keyword-ns) (symbol-ns)])
       simple-ident? (one-of [(keyword) (symbol)])
       qualified-ident? (such-that qualified? (one-of [(keyword-ns) (symbol-ns)]))
       keyword? (keyword-ns)
@@ -150,12 +150,12 @@ gens, each of which should generate something sequential."
       symbol? (symbol-ns)
       simple-symbol? (symbol)
       qualified-symbol? (such-that qualified? (symbol-ns))
-      ;; uuid? (uuid)
-      ;; uri? (fmap #(java.net.URI/create (str "http://" % ".com")) (uuid))
-      ;; bigdec? (fmap #(BigDecimal/valueOf %)
-      ;;               (double* {:infinite? false :NaN? false}))
-      ;; inst? (fmap #(java.util.Date. %)
-      ;;             (large-integer))
+      uuid? (uuid)
+	  uri? (fmap #(System.Uri. (str "http://" % ".com")) (uuid))              ;;; java.net.URI/create 
+      bigdec? (fmap #(BigDecimal/Create %)                                    ;;; BigDecimal/valueOf
+                    (double* {:infinite? false :NaN? false}))
+      inst? (fmap #(System.DateTime. %)                                       ;;; java.util.Date. 
+                  (large-integer))
       seqable? (one-of [(return nil)
                         (list simple)
                         (vector simple)
@@ -182,8 +182,7 @@ gens, each of which should generate something sequential."
       associative? (one-of [(map simple simple) (vector simple)])
       sequential? (one-of [(list simple) (vector simple)])
       ratio? (such-that ratio? (ratio))
-      ;; bytes? (bytes)
-      })))
+      bytes? (bytes)})))
 
 (defn gen-for-pred
   "Given a predicate, returns a built-in generator if one exists."

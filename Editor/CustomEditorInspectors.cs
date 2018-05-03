@@ -151,10 +151,11 @@ public class ArcadiaStateEditor : Editor
 		Arcadia.Util.getVar(ref OnInspectorGUIVar, ns, "state-inspector!");
 		ownVarsInitialized = true;
 	}
-	
+
+//TODO: remember to uncomment this sometime @pjago
 	public override void OnInspectorGUI()
 	{
-		RequireOwnVars();
-		Arcadia.Util.Invoke(OnInspectorGUIVar, target);
+//		RequireOwnVars();
+//		Arcadia.Util.Invoke(OnInspectorGUIVar, target);
 	}
 }

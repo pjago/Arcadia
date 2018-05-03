@@ -190,7 +190,7 @@ public class ArcadiaState : MonoBehaviour, ISerializationCallbackReceiver
 
 	public JumpMap.PartialArrayMapView pamv (object[] ks)
 	{
-		Debug.Log("In ArcadiaState.pamv. ks.Length:" + ks.Length);
+		// Debug.Log("In ArcadiaState.pamv. ks.Length:" + ks.Length);
 		return state.pamv(ks);
 	}
 }
